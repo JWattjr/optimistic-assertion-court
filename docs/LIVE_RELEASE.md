@@ -95,3 +95,107 @@ and the later evidence/docs commit. The remote history and source blob are check
 the local check result is retained in artifacts/remote-release-verification.json and reported
 in the final operator response. No credentials were printed or committed. No Portal submission
 was made. The public evidence repository contains the three fictional .txt files only.
+
+## Live appeal supplement — 2026-10-20
+
+This supplement uses the existing deployment and the original three test accounts. No contract
+source changed and no redeployment occurred. The on-chain source remains identical to commit
+`3b0ce9c68628538431942bc6d8db00773ab716cf`, blob `f90a574586da2012fd5206161835bb04b4a00dc7`.
+
+B=10. The asserter was funded with 40 synthetic units before posting the new FALSE claim.
+The original 18 transaction entries, 18 read-backs, their receipt objects and original final
+history remain unchanged. Eight transactions are appended, five successes and three expected
+rollbacks. All eight reached FINALIZED, with execution and votes recorded separately.
+
+### Timing and read-back policy
+
+The deployed appeal window is frozen at 60 seconds. Steps c/d/e/f used ACCEPTED-state
+LATEST_NONFINAL read-backs so protocol finality waits could not consume the entire window.
+Each execution was checked before continuing. Their FINALIZED receipts were subsequently
+collected and the final claim and full accounting were re-read at LATEST_FINAL. This is
+explicitly recorded; ACCEPTED observations are not presented as finality. No write was retried.
+
+The valid appeal's recorded timestamp precedes its frozen deadline by 6.289 seconds.
+
+| Step | ACCEPTED observed | FINALIZED | Leader execution/code | Votes | Explorer |
+|---|---|---|---|---|---|
+| Funding | YES | YES | SUCCESS/return | agree=4, idle=1 | [`0x49d4f69f39…`](https://explorer-studio.genlayer.com/tx/0x49d4f69f39b821ceedbd55478bb1e528f61387ef3e922c66acd7f1f5a63230e6) |
+| a. Assert FALSE | YES | YES | SUCCESS/return | agree=5 | [`0x876f9b4095…`](https://explorer-studio.genlayer.com/tx/0x876f9b409515565dbd121f4c3f7b2acdf970170fa6beb6cd3a670caba18dc993) |
+| b. Challenge B | YES | YES | SUCCESS/return | agree=4, idle=1 | [`0x6fdc2a4f7d…`](https://explorer-studio.genlayer.com/tx/0x6fdc2a4f7da0c2597223c66be7d79956a429abc5f066b68fc48a2957c602646f) |
+| c. Adjudicate FALSE | YES | YES | SUCCESS/return | agree=3, idle=2 | [`0x8bf578156f…`](https://explorer-studio.genlayer.com/tx/0x8bf578156f5ae58090c111afbbf2eb9d2d833e04c4b3c2369858170ce1b7edb3) |
+| d. Winner appeal rejected | YES | YES | ERROR/rollback | agree=3, idle=2 | [`0x70fac984eb…`](https://explorer-studio.genlayer.com/tx/0x70fac984eba0dd615f4c6b414afe57767ce210eac9e6d80b8326a46f451eb8fa) |
+| e. Wrong bond rejected | YES | YES | ERROR/rollback | agree=3, idle=2 | [`0xe986bafb1d…`](https://explorer-studio.genlayer.com/tx/0xe986bafb1dc6814067b9c17e9b9716a83a4f3c341fb0010a1ee1e4732d2aec56) |
+| f. Loser appeal confirms FALSE | YES | YES | SUCCESS/return | agree=3, idle=2 | [`0xb0577b9dd6…`](https://explorer-studio.genlayer.com/tx/0xb0577b9dd6df2efc8c5491106b007038abafe4b2d15502cf1509c497ed5d63ae) |
+| g. Second appeal rejected | YES | YES | ERROR/rollback | agree=5 | [`0x034330a78e…`](https://explorer-studio.genlayer.com/tx/0x034330a78ee855a2898dc77d0586a48a247d0f6c929cff227cee051c37f79bc0) |
+
+### Final claim read-back
+
+```json
+{
+  "appeal_bond_units": 20,
+  "appeal_deadline": "2026-10-20T06:50:33.332574+00:00",
+  "appeal_used": true,
+  "appealed_at": "2026-10-20T06:50:27.043355+00:00",
+  "appellant": "0xdb433ff614bdd1ece21aa97221c3e0a7ecf79c92",
+  "asserted_at": "2026-10-20T06:47:25.568784+00:00",
+  "asserter": "0xdb433ff614bdd1ece21aa97221c3e0a7ecf79c92",
+  "bond_units": 10,
+  "challenge_deadline": "2026-10-20T06:49:25.568784+00:00",
+  "challenged_at": "2026-10-20T06:48:09.280139+00:00",
+  "challenger": "0x331f7c1f71cab3bdb0cdb59a6f66b658acb0de00",
+  "claim_id": "C-000005",
+  "claim_text": "The certified length of the fictional Raven Bridge is exactly 200 metres.",
+  "escrow_units": 0,
+  "evidence_url": "https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/24cf4f229fc811b65df86f0c9593dccde2cd35a9/optimistic-assertion-court/appeal-raven-bridge.txt",
+  "final_result": {
+    "available": true,
+    "cited_text": "The certified length of the fictional Raven Bridge is exactly 100 metres.",
+    "evidence_digest": "sha256:5f23d4ac8c9a36d96a5c7e5ae0e962a59c75b2892146c8a328912fed852d4c18",
+    "verdict": "FALSE"
+  },
+  "final_winner": "0x331f7c1f71cab3bdb0cdb59a6f66b658acb0de00",
+  "first_result": {
+    "available": true,
+    "cited_text": "The certified length of the fictional Raven Bridge is exactly 100 metres.",
+    "evidence_digest": "sha256:5f23d4ac8c9a36d96a5c7e5ae0e962a59c75b2892146c8a328912fed852d4c18",
+    "verdict": "FALSE"
+  },
+  "judged_at": "2026-10-20T06:49:33.332574+00:00",
+  "provisional_winner": "0x331f7c1f71cab3bdb0cdb59a6f66b658acb0de00",
+  "settled_units": 40,
+  "settlement_count": 1,
+  "stale_deadline": "2026-10-20T07:18:09.280139+00:00",
+  "status": "FINAL",
+  "terminal_at": "2026-10-20T06:50:27.043355+00:00",
+  "verdict": "FALSE",
+  "void_reason": ""
+}
+```
+
+### Accounting
+
+```json
+{
+  "available_total": 140,
+  "conserved": true,
+  "locked_total": 0,
+  "paid_out": 100,
+  "total_deposited": 240
+}
+```
+
+Funded baseline: asserter=40, challenger=100. Final: asserter=10, challenger=130.
+The asserter's net is -30 (-3B); the challenger receives the 40-unit (4B) pot and nets +30.
+Claim escrow and total locked units are zero, and settlement_count is exactly one. The three
+rejected appeal attempts left claim/accounting state unchanged. Earlier claims are unchanged.
+
+### Appeal fixture
+
+[optimistic-assertion-court/appeal-raven-bridge.txt](https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/24cf4f229fc811b65df86f0c9593dccde2cd35a9/optimistic-assertion-court/appeal-raven-bridge.txt): curl HTTP 200; 313 raw bytes;
+SHA-256 `5f23d4ac8c9a36d96a5c7e5ae0e962a59c75b2892146c8a328912fed852d4c18`. The direct sentence has 73 characters and 12 words.
+Both judgments' digests match the curl body. The appeal's exact citation meets the stricter
+24-character/four-word rule.
+
+This live appeal supersedes the original report's local-only appeal limitation. Stale refunds,
+UNDETERMINED and unavailable-evidence outcomes remain local-test evidence. Units are synthetic;
+model risk remains. The repository stays PRIVATE and nothing was submitted to the Portal.

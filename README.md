@@ -100,3 +100,11 @@ comparison table in the design.
 
 All demo actors are controlled by one operator. The live demo does not exercise the appeal,
 stale-refund or unavailable-evidence paths; those are covered by mocked direct tests.
+
+## Live appeal supplement
+
+The existing deployment now also demonstrates a loser-funded 2B appeal
+confirming FALSE and awarding the full 4B pot, with winner, wrong-bond and second appeals
+rejected. Eight finalized transactions were appended to the original 18; earlier entries
+are unchanged. The earlier local-only appeal limitation is superseded by this evidence.
+See [the appended report](docs/LIVE_RELEASE.md#live-appeal-supplement--2026-10-20).

@@ -82,3 +82,20 @@ result. The two deliberate failures are ERROR/rollback, with unchanged state; th
 16 succeeded. Each has a LATEST_FINAL read-back and a passing conservation check.
 [Manifest](../deployments/studionet-release-2026-10-20.json) contains full votes and receipts.
 Appeal, stale refunds and unavailable/UNDETERMINED outcomes remain local-test evidence only.
+
+## Appended live appeal
+
+| Step | ACCEPTED observed | FINALIZED | Leader execution/code | Votes | Explorer |
+|---|---|---|---|---|---|
+| Funding | YES | YES | SUCCESS/return | agree=4, idle=1 | [`0x49d4f69f39…`](https://explorer-studio.genlayer.com/tx/0x49d4f69f39b821ceedbd55478bb1e528f61387ef3e922c66acd7f1f5a63230e6) |
+| a. Assert FALSE | YES | YES | SUCCESS/return | agree=5 | [`0x876f9b4095…`](https://explorer-studio.genlayer.com/tx/0x876f9b409515565dbd121f4c3f7b2acdf970170fa6beb6cd3a670caba18dc993) |
+| b. Challenge B | YES | YES | SUCCESS/return | agree=4, idle=1 | [`0x6fdc2a4f7d…`](https://explorer-studio.genlayer.com/tx/0x6fdc2a4f7da0c2597223c66be7d79956a429abc5f066b68fc48a2957c602646f) |
+| c. Adjudicate FALSE | YES | YES | SUCCESS/return | agree=3, idle=2 | [`0x8bf578156f…`](https://explorer-studio.genlayer.com/tx/0x8bf578156f5ae58090c111afbbf2eb9d2d833e04c4b3c2369858170ce1b7edb3) |
+| d. Winner appeal rejected | YES | YES | ERROR/rollback | agree=3, idle=2 | [`0x70fac984eb…`](https://explorer-studio.genlayer.com/tx/0x70fac984eba0dd615f4c6b414afe57767ce210eac9e6d80b8326a46f451eb8fa) |
+| e. Wrong bond rejected | YES | YES | ERROR/rollback | agree=3, idle=2 | [`0xe986bafb1d…`](https://explorer-studio.genlayer.com/tx/0xe986bafb1dc6814067b9c17e9b9716a83a4f3c341fb0010a1ee1e4732d2aec56) |
+| f. Loser appeal confirms FALSE | YES | YES | SUCCESS/return | agree=3, idle=2 | [`0xb0577b9dd6…`](https://explorer-studio.genlayer.com/tx/0xb0577b9dd6df2efc8c5491106b007038abafe4b2d15502cf1509c497ed5d63ae) |
+| g. Second appeal rejected | YES | YES | ERROR/rollback | agree=5 | [`0x034330a78e…`](https://explorer-studio.genlayer.com/tx/0x034330a78ee855a2898dc77d0586a48a247d0f6c929cff227cee051c37f79bc0) |
+
+The valid loser-funded appeal confirms FALSE with a 4B award and -3B asserter net.
+Winner, wrong-bond and second appeals revert without state changes. Full final
+claim/accounting read-backs and the timing policy are in LIVE_RELEASE.md.
