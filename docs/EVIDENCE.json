@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/JWattjr/genlayer-demo-evidence",
+  "visibility": "PUBLIC",
+  "commit": "9e2be4687ce6e52865e2dc387655764aa97dfb8c",
+  "folder": "optimistic-assertion-court",
+  "fixture_text_only": true,
+  "fixtures": [
+    {
+      "file": "unchallenged.txt",
+      "url": "https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/unchallenged.txt",
+      "commit": "9e2be4687ce6e52865e2dc387655764aa97dfb8c",
+      "curl_http_status": 200,
+      "curl_size_download": 266,
+      "raw_bytes": 266,
+      "sha256": "44afd9721f066a35fc71bffdc8ab23065aa39f0f7b60fe8545b53a0ae3a4d27a",
+      "exact_local_fixture_match": true,
+      "curl_output": "200 266 https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/unchallenged.txt"
+    },
+    {
+      "file": "false-assertion.txt",
+      "url": "https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/false-assertion.txt",
+      "commit": "9e2be4687ce6e52865e2dc387655764aa97dfb8c",
+      "curl_http_status": 200,
+      "curl_size_download": 266,
+      "raw_bytes": 266,
+      "sha256": "5c60a04191c6568babff5170e7f5f53137e952cf5362b26e16ae8b8b4b6f9148",
+      "exact_local_fixture_match": true,
+      "curl_output": "200 266 https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/false-assertion.txt"
+    },
+    {
+      "file": "frivolous-challenge.txt",
+      "url": "https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/frivolous-challenge.txt",
+      "commit": "9e2be4687ce6e52865e2dc387655764aa97dfb8c",
+      "curl_http_status": 200,
+      "curl_size_download": 266,
+      "raw_bytes": 266,
+      "sha256": "4d534906608e748ef5588ea2b1dbacc481d604234d6747f0f33244491b80a163",
+      "exact_local_fixture_match": true,
+      "curl_output": "200 266 https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/9e2be4687ce6e52865e2dc387655764aa97dfb8c/optimistic-assertion-court/frivolous-challenge.txt"
+    }
+  ]
+}

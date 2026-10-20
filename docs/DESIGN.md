@@ -1,6 +1,9 @@
 # Optimistic Assertion Court
 
 Phase 2 implementation specification, updated 2026-10-20 after approval.
+Status update: Phase 2 has been reviewed; the user authorized Phase 3 on
+2026-10-20. Historical Phase 2 stop language below describes that earlier
+boundary. See `REVIEW.md` for findings and `EVIDENCE.json` for pinned fixtures.
 This revision incorporates verified leader citations and permissionless stale
 dispute refunds. Phase 2 ends with local checks and commits; no deployment,
 repository creation, push or key retrieval is authorized in this phase.
@@ -615,7 +618,7 @@ Views:
 
 | Method | Purpose |
 |---|---|
-| `get_config() -> dict` | Court title, frozen windows, fixed bounds, claim count, total deposited. |
+| `get_config() -> dict` | Court title, frozen windows, fixed bounds and claim count. Deposits are in `get_accounting()`. |
 | `get_claim(claim_id: str) -> dict` | Full claim record, including both result JSONs and escrow. |
 | `get_balance(account: Address) -> int` | Withdrawable synthetic balance. |
 | `get_accounting() -> dict` | `total_deposited`, `available_total`, `locked_total`, `paid_out`, `conserved`. |

@@ -44,6 +44,13 @@ alone would test only the leader.
 
 ## Evidence limits
 
+The pre-live review adds 53 cases (166 total). `tests/test_review.py` covers
+both validator stages, all stored fields, settlement-field injection,
+cross-claim/stage/evidence replay, failed support confirmation, exact leader
+quote preservation, wrong-caller withdrawals, and simulated consensus refusal
+before any storage write. Every rejection also compares the complete nonzero
+direct-VM storage snapshot. See `REVIEW.md` for the scope and limitations.
+
 All model/web responses are controlled fixtures except a transport-error unit
 fixture. Independent callback execution verifies the comparison code with these
 fixtures; it does not demonstrate actual validator votes, network finality,

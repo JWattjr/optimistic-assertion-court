@@ -44,9 +44,15 @@ def invoke(court, method, *args):
 
 def rejected(vm, court, method, *args, message=None):
     before = (check(court), court.get_history())
+    # Reads can materialize zero-filled slots in the direct VM. Compare every
+    # nonzero storage byte, not only the aggregate totals and history length.
+    def storage():
+        return {slot: data.rstrip(b"\0") for slot, data in vm._storage.snapshot().items() if any(data)}
+    before_storage = storage()
     with vm.expect_revert(message):
         getattr(court, method)(*args)
     assert (check(court), court.get_history()) == before
+    assert storage() == before_storage
 
 
 @pytest.fixture

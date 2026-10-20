@@ -1,0 +1,35 @@
+{
+  "reviewed_phase2_commit": "37603174bf145d8b5fd4dc3571d6ce5781c37cc2",
+  "production_source_changed": false,
+  "source_sha256": "0ec8715d499d3b87cb05c02d2b78c846df0aafee27149fe039d34bf7d588c899",
+  "tests": {
+    "tests": 166,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest_stdout": "........................................................................ [ 43%]\n........................................................................ [ 86%]\n......................                                                   [100%]\n166 passed in 25.70s\n",
+  "lint": {
+    "ok": true,
+    "lint": {
+      "ok": true,
+      "passed": 3
+    },
+    "validate": {
+      "ok": true,
+      "contract": "OptimisticAssertionCourt",
+      "methods": 13,
+      "view_methods": 5,
+      "write_methods": 8,
+      "ctor_params": 4,
+      "warnings": [
+        {
+          "code": "I200",
+          "msg": "py-genlayer: a newer runner is available (babwp9t37jw9g4j2bccgn14g6x7x9s1f7dsmh7emvz735pz4zxa0). See https://github.com/genlayerlabs/genvm-manager/releases for changes."
+        }
+      ]
+    }
+  },
+  "lint_stderr": "",
+  "python_executable": "C:\\Users\\User\\Desktop\\Genlayer apps\\intelligent-contracts-v2\\.venv\\Scripts\\python.exe"
+}
