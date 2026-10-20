@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/JWattjr/genlayer-demo-evidence",
+  "visibility": "PUBLIC",
+  "commit": "24cf4f229fc811b65df86f0c9593dccde2cd35a9",
+  "file": "optimistic-assertion-court/appeal-raven-bridge.txt",
+  "url": "https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/24cf4f229fc811b65df86f0c9593dccde2cd35a9/optimistic-assertion-court/appeal-raven-bridge.txt",
+  "raw_bytes": 313,
+  "curl_size_download": 313,
+  "curl_http_status": 200,
+  "sha256": "5f23d4ac8c9a36d96a5c7e5ae0e962a59c75b2892146c8a328912fed852d4c18",
+  "curl_output": "200 313 https://raw.githubusercontent.com/JWattjr/genlayer-demo-evidence/24cf4f229fc811b65df86f0c9593dccde2cd35a9/optimistic-assertion-court/appeal-raven-bridge.txt",
+  "claim_level_sentence": "The certified length of the fictional Raven Bridge is exactly 100 metres.",
+  "sentence_characters": 73,
+  "sentence_words": 12
+}
