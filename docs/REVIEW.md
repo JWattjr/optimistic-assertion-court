@@ -73,3 +73,15 @@ The user has now authorized Phase 3. The older phase-boundary wording in the
 Phase 2 handoff is historical. The contract GitHub repo must be PRIVATE; the
 separate evidence repo is PUBLIC and contains fixture text only. No Portal
 submission is authorized. Stop on an unexpected live judgment.
+
+## Release transport follow-up
+
+The SDK broadcast the challenger deposit successfully, then received HTTP 502
+while reading its receipt. The write was located by its actor, decoded calldata
+and contract address; it was not resubmitted. The release runner now captures
+native broadcast acknowledgements immediately and retries only transient
+read-only RPC requests. Four focused guard tests prove hash capture, bounded
+read retry, no retry after an ambiguous write failure, and no retry of a
+nontransient read error. Total verification is now **170 passing tests**:
+166 direct contract cases and four release-control cases. This changes the
+release controller only; deployed contract source bytes remain unchanged.

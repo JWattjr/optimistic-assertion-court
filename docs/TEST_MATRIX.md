@@ -44,6 +44,10 @@ alone would test only the leader.
 
 ## Evidence limits
 
+Release transport controls: `tests/test_rpc_guard.py` adds four cases for
+immediate broadcast-hash capture, receipt-only retry, no write retry after an
+ambiguous failure, and no nontransient-read retry. Combined total: 170 tests.
+
 The pre-live review adds 53 cases (166 total). `tests/test_review.py` covers
 both validator stages, all stored fields, settlement-field injection,
 cross-claim/stage/evidence replay, failed support confirmation, exact leader

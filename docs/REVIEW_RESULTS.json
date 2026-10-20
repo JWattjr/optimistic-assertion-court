@@ -3,12 +3,12 @@
   "production_source_changed": false,
   "source_sha256": "0ec8715d499d3b87cb05c02d2b78c846df0aafee27149fe039d34bf7d588c899",
   "tests": {
-    "tests": 166,
+    "tests": 170,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
-  "pytest_stdout": "........................................................................ [ 43%]\n........................................................................ [ 86%]\n......................                                                   [100%]\n166 passed in 25.70s\n",
+  "pytest_stdout": "........................................................................ [ 42%]\n........................................................................ [ 84%]\n..........................                                               [100%]\n170 passed in 26.56s\n",
   "lint": {
     "ok": true,
     "lint": {
@@ -31,5 +31,7 @@
     }
   },
   "lint_stderr": "",
-  "python_executable": "C:\\Users\\User\\Desktop\\Genlayer apps\\intelligent-contracts-v2\\.venv\\Scripts\\python.exe"
+  "python_executable": "C:\\Users\\User\\Desktop\\Genlayer apps\\intelligent-contracts-v2\\.venv\\Scripts\\python.exe",
+  "contract_cases": 166,
+  "release_rpc_guard_cases": 4
 }

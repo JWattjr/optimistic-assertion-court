@@ -18,6 +18,7 @@ from genlayer_py.chains import studionet
 from genlayer_py.types import TransactionHashVariant
 
 from studionet_compat import RUNNER, pinned_runner_calldata
+from rpc_guard import guarded_request
 
 ROOT = Path(__file__).resolve().parents[1]
 DATE = "2026-10-20"
@@ -32,6 +33,26 @@ record = {}
 clients = {}
 address = None
 known_claims = []
+
+
+def install_rpc_guards():
+    for actor, client in clients.items():
+        request = client.provider.make_request
+
+        def guarded(method, params, _request=request, _actor=actor):
+            def broadcast(native_hash):
+                record.setdefault("broadcasts", []).append({"actor": _actor, "evm_hash": native_hash,
+                    "operation": record.get("submitting_operation"), "at": datetime.now(timezone.utc).isoformat()})
+                save()
+
+            def transient(method, attempt, error):
+                record.setdefault("transport_incidents", []).append({"method": method, "attempt": attempt, "error": error})
+                save()
+                emit(readonly_rpc_retry=method, attempt=attempt)
+
+            return guarded_request(_request, method, params, broadcast=broadcast, transient=transient)
+
+        client.provider.make_request = guarded
 
 
 class UnexpectedJudgment(RuntimeError):
@@ -67,10 +88,21 @@ def git(*args):
 
 
 def rpc(method, params):
-    response = requests.post(ENDPOINT, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
-                             timeout=(15, 60))
-    response.raise_for_status()
-    result = response.json()
+    def request(method, params):
+        response = requests.post(ENDPOINT, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
+                                 timeout=(15, 60))
+        response.raise_for_status()
+        try:
+            return response.json()
+        except ValueError:
+            raise RuntimeError("invalid JSON RPC response")
+
+    def transient(method, attempt, error):
+        record.setdefault("transport_incidents", []).append({"method": method, "attempt": attempt, "error": error})
+        save()
+        emit(readonly_rpc_retry=method, attempt=attempt)
+
+    result = guarded_request(request, method, params, broadcast=lambda _: None, transient=transient)
     with RPC_LOG.open("a", encoding="utf-8", newline="\n") as stream:
         stream.write(json.dumps({"at": datetime.now(timezone.utc).isoformat(), "method": method,
                                  "params": params, "response": redact(result)}) + "\n")
@@ -130,6 +162,8 @@ def wait(entry):
 
 
 def submit(label, actor, method, args, *, expected_failure=None):
+    record["submitting_operation"] = label
+    save()
     tx = clients[actor].write_contract(address=address, function_name=method, args=args, leader_only=False)
     entry = {"operation": label, "actor": actor, "method": method, "args": args, "hash": str(tx),
              "expected_failure": expected_failure, "lifecycle_observations": [],
@@ -193,6 +227,56 @@ def judge(claim, expected, fixture):
     assert row["status"] == "FINAL" and row["final_winner"] == winner and row["settled_units"] == 20
 
 
+def run_demo(fixtures, commit):
+    known_claims.append("C-000001")
+    submit("a-assert-true-unchallenged", "asserter", "assert_claim", [TRUE_CLAIM, fixtures["unchallenged.txt"]["url"], 10])
+    row = record["readbacks"][-1]["claims"]["C-000001"]
+    until(row["challenge_deadline"])
+    entry = submit("a-finalize-unchallenged", "relayer", "finalize", ["C-000001"])
+    row = record["readbacks"][-1]["claims"]["C-000001"]
+    assert row["status"] == "ACCEPTED" and row["settled_units"] == 10 and row["first_result"] == {}
+    assert record["readbacks"][-1]["balances"]["asserter"] == 100
+    nondet = {key: value for key, value in entry["leader_call_counts"].items()
+              if any(token in key.upper() for token in ("NONDET", "PROMPT", "WEB", "SPAWN"))}
+    record["unchallenged_no_application_nondeterminism"] = {"source_path_proves_no_judge_call": True,
+                  "receipt_call_counts": entry["leader_call_counts"], "nondet_call_counts": nondet}
+    assert not any(nondet.values())
+
+    for claim_id, text, fixture_name, expected in [
+        ("C-000002", FALSE_CLAIM, "false-assertion.txt", "FALSE"),
+        ("C-000003", TRUE_CLAIM, "frivolous-challenge.txt", "TRUE")]:
+        known_claims.append(claim_id)
+        submit(claim_id + "-assert", "asserter", "assert_claim", [text, fixtures[fixture_name]["url"], 10])
+        submit(claim_id + "-challenge", "challenger", "challenge", [claim_id, 10])
+        until(record["readbacks"][-1]["claims"][claim_id]["challenge_deadline"])
+        judge(claim_id, expected, fixtures[fixture_name])
+
+    known_claims.append("C-000004")
+    submit("d-assert-for-late-challenge", "asserter", "assert_claim", [TRUE_CLAIM, fixtures["unchallenged.txt"]["url"], 10])
+    until(record["readbacks"][-1]["claims"]["C-000004"]["challenge_deadline"])
+    before = record["readbacks"][-1]
+    submit("d-EXPECTED-FAILURE-late-challenge", "challenger", "challenge", ["C-000004", 10],
+           expected_failure="challenge window has closed")
+    after = record["readbacks"][-1]
+    assert all(before[field] == after[field] for field in ("accounting", "balances", "claims"))
+    submit("d-finalize-after-rejected-challenge", "relayer", "finalize", ["C-000004"])
+
+    balance = record["readbacks"][-1]["balances"]["asserter"]
+    assert balance == 100
+    submit("e-first-withdrawal", "asserter", "withdraw_units", [balance])
+    before = record["readbacks"][-1]
+    submit("e-EXPECTED-FAILURE-second-withdrawal", "asserter", "withdraw_units", [balance],
+           expected_failure="insufficient available balance")
+    after = record["readbacks"][-1]
+    assert all(before[field] == after[field] for field in ("accounting", "balances", "claims"))
+    record["final_history"] = view("get_history", [])
+    record["gates"] = {"technical": "PASS", "distinctiveness": "PASS", "evidence": "PASS_PENDING_FINAL_PUSH"}
+    record["status"] = "LIVE_DEMO_PASS_PENDING_FINAL_PUSH"
+    save()
+    emit(status=record["status"], address=address, source_commit=commit,
+         transactions=len(record["transactions"]))
+
+
 def main():
     global address, clients, record
     if OUTPUT.exists():
@@ -232,6 +316,7 @@ def main():
     del credential
     clients = {name: create_client(chain=studionet, account=account) for name, account in
                {"asserter": asserter, "challenger": challenger, "relayer": relayer}.items()}
+    install_rpc_guards()
     record["participants"] = {name: client.local_account.address for name, client in clients.items()}
     save()
     with pinned_runner_calldata(chain_id=61999, runner=RUNNER):
@@ -255,53 +340,7 @@ def main():
         submit("deposit-asserter", "asserter", "deposit_units", [100])
         submit("deposit-challenger", "challenger", "deposit_units", [100])
 
-        known_claims.append("C-000001")
-        submit("a-assert-true-unchallenged", "asserter", "assert_claim", [TRUE_CLAIM, fixtures["unchallenged.txt"]["url"], 10])
-        row = record["readbacks"][-1]["claims"]["C-000001"]
-        until(row["challenge_deadline"])
-        entry = submit("a-finalize-unchallenged", "relayer", "finalize", ["C-000001"])
-        row = record["readbacks"][-1]["claims"]["C-000001"]
-        assert row["status"] == "ACCEPTED" and row["settled_units"] == 10 and row["first_result"] == {}
-        assert record["readbacks"][-1]["balances"]["asserter"] == 100
-        nondet = {key: value for key, value in entry["leader_call_counts"].items()
-                  if any(token in key.upper() for token in ("NONDET", "PROMPT", "WEB", "SPAWN"))}
-        record["unchallenged_no_application_nondeterminism"] = {"source_path_proves_no_judge_call": True,
-                      "receipt_call_counts": entry["leader_call_counts"], "nondet_call_counts": nondet}
-        assert not any(nondet.values())
-
-        for claim_id, text, fixture_name, expected in [
-            ("C-000002", FALSE_CLAIM, "false-assertion.txt", "FALSE"),
-            ("C-000003", TRUE_CLAIM, "frivolous-challenge.txt", "TRUE")]:
-            known_claims.append(claim_id)
-            submit(claim_id + "-assert", "asserter", "assert_claim", [text, fixtures[fixture_name]["url"], 10])
-            submit(claim_id + "-challenge", "challenger", "challenge", [claim_id, 10])
-            until(record["readbacks"][-1]["claims"][claim_id]["challenge_deadline"])
-            judge(claim_id, expected, fixtures[fixture_name])
-
-        known_claims.append("C-000004")
-        submit("d-assert-for-late-challenge", "asserter", "assert_claim", [TRUE_CLAIM, fixtures["unchallenged.txt"]["url"], 10])
-        until(record["readbacks"][-1]["claims"]["C-000004"]["challenge_deadline"])
-        before = record["readbacks"][-1]
-        submit("d-EXPECTED-FAILURE-late-challenge", "challenger", "challenge", ["C-000004", 10],
-               expected_failure="challenge window has closed")
-        after = record["readbacks"][-1]
-        assert all(before[field] == after[field] for field in ("accounting", "balances", "claims"))
-        submit("d-finalize-after-rejected-challenge", "relayer", "finalize", ["C-000004"])
-
-        balance = record["readbacks"][-1]["balances"]["asserter"]
-        assert balance == 100
-        submit("e-first-withdrawal", "asserter", "withdraw_units", [balance])
-        before = record["readbacks"][-1]
-        submit("e-EXPECTED-FAILURE-second-withdrawal", "asserter", "withdraw_units", [balance],
-               expected_failure="insufficient available balance")
-        after = record["readbacks"][-1]
-        assert all(before[field] == after[field] for field in ("accounting", "balances", "claims"))
-        record["final_history"] = view("get_history", [])
-        record["gates"] = {"technical": "PASS", "distinctiveness": "PASS", "evidence": "PASS_PENDING_FINAL_PUSH"}
-        record["status"] = "LIVE_DEMO_PASS_PENDING_FINAL_PUSH"
-        save()
-        emit(status=record["status"], address=address, source_commit=commit,
-             transactions=len(record["transactions"]))
+        run_demo(fixtures, commit)
 
 
 if __name__ == "__main__":

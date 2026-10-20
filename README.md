@@ -6,7 +6,8 @@ validators independently read the same frozen URL, agree on verdict, byte digest
 and availability, and verify the leader's exact supporting citation. Contract
 code settles the synthetic ledger. Only the loser may fund one stricter appeal.
 
-The Phase 2 implementation has passed the pre-live review and 166 direct tests.
+The implementation passed pre-live review: 166 direct contract cases plus
+4 release RPC guard tests, 170 local tests in total.
 See [design](docs/DESIGN.md), [test matrix](docs/TEST_MATRIX.md),
 [review](docs/REVIEW.md), and [Phase 2 handoff](docs/PHASE2_HANDOFF.md).
 Pinned fixture measurements are in [EVIDENCE.json](docs/EVIDENCE.json).
