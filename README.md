@@ -13,6 +13,32 @@ See [design](docs/DESIGN.md), [test matrix](docs/TEST_MATRIX.md),
 Pinned fixture measurements are in [EVIDENCE.json](docs/EVIDENCE.json).
 Live execution is recorded separately in the dated deployment manifest.
 
+## StudioNet release — 2026-10-20
+
+Contract: `0xC59715a21e2cac8e8978F4D3098087930399fCF2`. All 18 demo transactions reached FINALIZED;
+16 executed successfully and the two deliberate failures reverted as expected.
+The three gates — technical, local distinctiveness and evidence — pass.
+
+Deployed-source commit: `3b0ce9c68628538431942bc6d8db00773ab716cf`. Contract Git blob: `f90a574586da2012fd5206161835bb04b4a00dc7`.
+The deployed source matches all 23,139 Git blob bytes exactly.
+The final repository HEAD adds documentation and the manifest while retaining that source blob.
+
+[Manifest](deployments/studionet-release-2026-10-20.json) records constructor arguments, every
+transaction lifecycle, execution result, votes, read-backs and accounting checks.
+[Live report](docs/LIVE_RELEASE.md) and [Portal draft](SUBMISSION_DRAFT.md) are review artifacts;
+nothing was submitted. The contract repository remains PRIVATE. The public
+[fixture repository](https://github.com/JWattjr/genlayer-demo-evidence) contains fictional text only.
+
+| Required live case | Outcome | FINALIZED transaction |
+|---|---|---|
+| a. True, unchallenged | ACCEPTED; B refunded; no application nondeterminism | [`0x7e7ef28fe8…`](https://explorer-studio.genlayer.com/tx/0x7e7ef28fe87f011991c605c816fde8b3f4b0f355c02ba4185f91d2e19d59800e) |
+| b. False, challenged | FALSE; challenger provisional winner | [`0x688502f0ef…`](https://explorer-studio.genlayer.com/tx/0x688502f0ef5512244fa7f4922f93de91fc05b822da67a6b0d17a70521e6ce467) |
+| b. Award released | FINAL; challenger receives 2B; asserter loses B | [`0xa7c9684e2a…`](https://explorer-studio.genlayer.com/tx/0xa7c9684e2a4958228014f85aa0cd23f60b4a0c1063531e5d1eb84e576e7f54b1) |
+| c. Frivolous challenge | TRUE; asserter provisional winner | [`0x6471420043…`](https://explorer-studio.genlayer.com/tx/0x64714200430d26d74e8fd4b354ac24026fa820966d1f1581fd5919b49e0917d1) |
+| c. Award released | FINAL; asserter receives 2B; challenger loses B | [`0xc6df9b659e…`](https://explorer-studio.genlayer.com/tx/0xc6df9b659ebb635d40711e140000c180db56d1c7150eb625453748eddb1e11f7) |
+| d. Late challenge | Expected ERROR/rollback; state unchanged | [`0x0bc9e060bf…`](https://explorer-studio.genlayer.com/tx/0x0bc9e060bf03b71bf6dbe5cec4910cca672567a1c04d2babe3549f680cf9e30c) |
+| e. Second withdrawal | Expected ERROR/rollback; state unchanged | [`0x8df4dcfb09…`](https://explorer-studio.genlayer.com/tx/0x8df4dcfb09f2df218d245bf8ccf998df9561ee4e788b87c1cc84acfe515a3593) |
+
 ## Settlement
 
 Let the original bond be `B`; the challenger posts exactly `B`. A determinate
@@ -63,7 +89,7 @@ custodied or transferred. Evidence is one complete returned HTTP-200 UTF-8 body
 of 1-15,000 bytes. No rendering, prefix classification, link following, publisher
 authentication or external transfers occur in contract code. The pinned SDK
 does not expose redirect controls; runtime redirects and transport completeness
-need live review. Model error and prompt injection remain risks. Storage is
+are only verified for the pinned demo responses. Model error and prompt injection remain risks. Storage is
 bounded to 32 claims, 128 ledger accounts and 256 history records.
 
 Unchallenged acceptance is acceptance by this mechanism, not an independently
@@ -71,3 +97,6 @@ verified truth finding. Court `ACCEPTED`/`FINAL` are distinct from protocol
 transaction `ACCEPTED`/`FINALIZED`. The five local comparators do not gate their
 semantic judgments on a matched-bond economic dispute; see the source-backed
 comparison table in the design.
+
+All demo actors are controlled by one operator. The live demo does not exercise the appeal,
+stale-refund or unavailable-evidence paths; those are covered by mocked direct tests.

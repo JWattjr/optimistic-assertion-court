@@ -64,3 +64,21 @@ to 201 units, avoiding a million maximum-sized deposits. The production source
 remains capped at 10^18. History's 256-record cap is unreachable through 32 valid
 claims (at most four persisted lifecycle events per claim); the test exercises
 all 32 unchallenged claim lifecycles and checks bounded monotonic history.
+
+## Phase 3 live evidence — 2026-10-20
+
+| Required live case | Outcome | FINALIZED transaction |
+|---|---|---|
+| a. True, unchallenged | ACCEPTED; B refunded; no application nondeterminism | [`0x7e7ef28fe8…`](https://explorer-studio.genlayer.com/tx/0x7e7ef28fe87f011991c605c816fde8b3f4b0f355c02ba4185f91d2e19d59800e) |
+| b. False, challenged | FALSE; challenger provisional winner | [`0x688502f0ef…`](https://explorer-studio.genlayer.com/tx/0x688502f0ef5512244fa7f4922f93de91fc05b822da67a6b0d17a70521e6ce467) |
+| b. Award released | FINAL; challenger receives 2B; asserter loses B | [`0xa7c9684e2a…`](https://explorer-studio.genlayer.com/tx/0xa7c9684e2a4958228014f85aa0cd23f60b4a0c1063531e5d1eb84e576e7f54b1) |
+| c. Frivolous challenge | TRUE; asserter provisional winner | [`0x6471420043…`](https://explorer-studio.genlayer.com/tx/0x64714200430d26d74e8fd4b354ac24026fa820966d1f1581fd5919b49e0917d1) |
+| c. Award released | FINAL; asserter receives 2B; challenger loses B | [`0xc6df9b659e…`](https://explorer-studio.genlayer.com/tx/0xc6df9b659ebb635d40711e140000c180db56d1c7150eb625453748eddb1e11f7) |
+| d. Late challenge | Expected ERROR/rollback; state unchanged | [`0x0bc9e060bf…`](https://explorer-studio.genlayer.com/tx/0x0bc9e060bf03b71bf6dbe5cec4910cca672567a1c04d2babe3549f680cf9e30c) |
+| e. Second withdrawal | Expected ERROR/rollback; state unchanged | [`0x8df4dcfb09…`](https://explorer-studio.genlayer.com/tx/0x8df4dcfb09f2df218d245bf8ccf998df9561ee4e788b87c1cc84acfe515a3593) |
+
+All 18 transactions have a FINALIZED lifecycle observation and a separate leader execution
+result. The two deliberate failures are ERROR/rollback, with unchanged state; the other
+16 succeeded. Each has a LATEST_FINAL read-back and a passing conservation check.
+[Manifest](../deployments/studionet-release-2026-10-20.json) contains full votes and receipts.
+Appeal, stale refunds and unavailable/UNDETERMINED outcomes remain local-test evidence only.
